@@ -1,0 +1,87 @@
+# # 1
+# N = int(input("Введите число N task1: "))
+# for i in range(1, N + 1):
+#     print(i)
+
+# # 2
+# N = int(input("Введите число N task2: "))
+# while N >= 1:
+#     print(N)
+#     N = N - 1
+
+# # 3
+# for i in range(2, 21, 2):
+#     print(i)
+
+# # 4
+# count = 0 
+# while True:
+#     num = int(input("Введите число:"))
+#     if num == 0:
+#         break
+#     count += num
+# print(f"Итог:{count}")
+
+
+# # 5
+# for i in range(1, 11):
+#     for j in range(1, 11):
+#         print(i, "×", j, "=", i * j)
+
+# # 6
+# secret = 42
+# attempts = 0
+# while True:
+#     guess = int(input("Your guess: "))
+#     attempts = attempts + 1
+#     if guess < secret:
+#         print("Higher")
+#         continue
+#     if guess > secret:
+#         print("Lower")
+#         continue
+#     print("Victory!")
+#     break
+# print(attempts)
+
+
+# # 7
+# text = input("Enter string: ").lower()
+# vowels = "a,e,i,o,u,y,а,е,ё,и,о,у,ы,э,ю,я" 
+
+# count = 0
+# for ch in text:
+#     if ch in vowels:
+#         count = count + 1
+# print(count)
+
+# # 8
+# N8 = int(input("Enter N: "))
+# result8 = 1
+# for i in range(2, N8 + 1):
+#     result8 = result8 * i
+# if N8 == 0:
+#     result88 = 1
+# print(result88)
+
+
+# # 9
+# numbers = [12, -5, 0, 44, 23]
+# maximum = numbers[0]
+# for num in numbers:
+#     if num > maximum:
+#         maximum = num
+# print(maximum)
+
+# # 10
+
+# N = int(input("Enter N: "))
+# a = 0
+# b = 1
+# counter = 0
+# while counter < N:
+#     print(a)
+#     next_val = a + b
+#     a = b
+#     b = next_val
+#     counter = counter + 1
