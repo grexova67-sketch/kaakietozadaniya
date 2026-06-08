@@ -1,0 +1,39 @@
+A = int(input("Введите A: "))
+B = int(input("Введите B: "))
+K = int(input("Введите K: "))
+
+count = 0
+minnum = 0
+maxnum = 0
+
+for num in range(A, B + 1):
+   
+    p = 1
+    n = num  
+    
+   
+    while n > 0:
+        digit = n % 10 
+        if digit != 0:
+            p = p * digit  
+        n = n // 10  
+    
+
+    if p == K:
+        count = count + 1
+        if count == 1: 
+            minnum = num
+            maxnum = num
+        else:
+            if num < minnum:
+                min_num = num
+            if num > maxnum:
+                maxnum = num
+
+
+if count == 0:
+    print("Подходящих чисел нет")
+else:
+    print("Количество:", count)
+    print("Минимальное:", minnum)
+    print("Максимальное:", maxnum)
