@@ -1,0 +1,166 @@
+# финансовыый дневник высчитывает доход, расход 
+
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+from datetime import datetime
+import json
+import os
+
+class FinanceData:
+    def __init__(self, filename="finance.json"):
+        self.filename = filename
+        self.data = []
+        self.load()
+
+    def load(self):
+        if os.path.exists(self.filename):
+            try:
+                with open(self.filename, 'r', encoding='utf-8') as f:
+                    self.data = json.load(f)
+            except:
+                self.data = []
+        else:
+            self.data = []
+            self.save()
+
+    def save(self):
+        with open(self.filename, 'w', encoding='utf-8') as f:
+            json.dump(self.data, f, ensure_ascii=False, indent=2)
+
+    def add(self, trans_type, amount, category, desc, date):
+        item = {
+            'id': len(self.data) + 1,
+            'type': trans_type,
+            'amount': amount,
+            'category': category,
+            'desc': desc,
+            'date': date
+        }
+        self.data.append(item)
+        self.save()
+
+    def delete(self, item_id):
+        self.data = [x for x in self.data if x['id'] != item_id]
+        self.save()
+
+    def get_all(self):
+        return sorted(self.data, key=lambda x: x['date'], reverse=True)
+
+    def stats(self):
+        income = sum(x['amount'] for x in self.data if x['type'] == 'Доход')
+        expense = sum(x['amount'] for x in self.data if x['type'] == 'Расход')
+        return {'income': income, 'expense': expense, 'balance': income - expense, 'count': len(self.data)}
+
+
+class FinanceApp:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Финансовый дневник")
+        self.root.geometry("800x500")
+        self.data = FinanceData()
+        
+        # Категории
+        self.categories = {
+            "Доход": ["Зарплата", "Фриланс", "Инвестиции", "Подарок", "Другое"],
+            "Расход": ["Еда", "Транспорт", "Развлечение", "Покупки", "Коммунальные", "Здоровье", "Другое"]
+        }
+        
+        # Форма
+        form = tk.Frame(self.root)
+        form.pack(fill=tk.X, padx=10, pady=10)
+        
+        tk.Label(form, text="Тип").pack(side=tk.LEFT)
+        self.type_var = tk.StringVar(value="Расход")
+        self.type_combo = ttk.Combobox(form, textvariable=self.type_var, values=["Доход", "Расход"], width=10, state="readonly")
+        self.type_combo.pack(side=tk.LEFT, padx=5)
+        self.type_combo.bind("<<ComboboxSelected>>", lambda e: self._update_categories())
+        
+        tk.Label(form, text="Сумма").pack(side=tk.LEFT)
+        self.amount = tk.Entry(form, width=10)
+        self.amount.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(form, text="Категория").pack(side=tk.LEFT)
+        self.category_var = tk.StringVar()
+        self.category = ttk.Combobox(form, textvariable=self.category_var, width=10, state="readonly")
+        self.category.pack(side=tk.LEFT, padx=5)
+        self._update_categories()
+        
+        tk.Label(form, text="Описание").pack(side=tk.LEFT)
+        self.desc = tk.Entry(form, width=15)
+        self.desc.pack(side=tk.LEFT, padx=5)
+        
+        tk.Button(form, text="Добавить", command=self._add).pack(side=tk.LEFT, padx=5)
+        
+        # Таблица
+        cols = ("ID", "Дата", "Тип", "Категория", "Сумма", "Описание")
+        self.tree = ttk.Treeview(self.root, columns=cols, show="headings", height=15)
+        for col in cols:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=100)
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Кнопки
+        btn_frame = tk.Frame(self.root)
+        btn_frame.pack(fill=tk.X, padx=10, pady=10)
+        tk.Button(btn_frame, text="Удалить", command=self._delete, bg="red", fg="white").pack(side=tk.LEFT, padx=5)
+        
+        # Статистика
+        self.stat_label = tk.Label(self.root, text="", font=("Arial", 10, "bold"))
+        self.stat_label.pack(fill=tk.X, padx=10)
+        
+        self._refresh()
+    
+    def _update_categories(self):
+        trans_type = self.type_var.get()
+        cats = self.categories[trans_type]
+        self.category['values'] = cats
+        self.category_var.set(cats[0])
+    
+    def _add(self):
+        try:
+            amount = float(self.amount.get())
+            if amount <= 0:
+                messagebox.showerror("Ошибка", "Сумма должна быть больше 0")
+                return
+        except:
+            messagebox.showerror("Ошибка", "Некорректная сумма")
+            return
+        
+        self.data.add(
+            self.type_var.get(),
+            amount,
+            self.category_var.get(),
+            self.desc.get() or "-",
+            datetime.now().strftime("%Y-%m-%d")
+        )
+        
+        self.amount.delete(0, tk.END)
+        self.desc.delete(0, tk.END)
+        self._refresh()
+        messagebox.showinfo("Успех", "Запись добавлена")
+    
+    def _delete(self):
+        sel = self.tree.selection()
+        if not sel:
+            messagebox.showwarning("Внимание", "Выберите запись")
+            return
+        item_id = int(self.tree.item(sel[0])["values"][0])
+        self.data.delete(item_id)
+        self._refresh()
+    
+    def _refresh(self):
+        self.tree.delete(*self.tree.get_children())
+        for t in self.data.get_all():
+            sign = "+" if t["type"] == "Доход" else "-"
+            self.tree.insert("", tk.END, values=(t["id"], t["date"], t["type"], t["category"], f"{sign}{t['amount']}", t["desc"]))
+        
+        stats = self.data.stats()
+        self.stat_label.config(text=f"Баланс: {stats['balance']:,.0f} ₽  |  Доходы: {stats['income']:,.0f} ₽  |  Расходы: {stats['expense']:,.0f} ₽  |  Всего: {stats['count']}")
+    
+    def run(self):
+        self.root.mainloop()
+
+
+if __name__ == "__main__":
+    FinanceApp().run()
