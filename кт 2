@@ -1,0 +1,120 @@
+import random
+
+# функция для первого задания
+def task_1():
+    print("\n--- задание 1 ---")
+    # создаем пустой список на 10 элементов
+    numbers = []
+    
+    # заполняем список числами от 1 до 10
+    for i in range(1, 11):
+        numbers.append(i)
+    
+    print("исходный массив:", numbers)
+    
+    # переворачиваем список
+    numbers.reverse()
+    
+    print("перевернутый массив:", numbers)
+
+# функция для второго задания
+def task_2():
+    print("\n--- задание 2 ---")
+    rows = int(input("введите количество строк: "))
+    cols = int(input("введите количество столбцов: "))
+    
+    matrix = []
+    
+    print("матрица:")
+    for i in range(rows):
+        row = [] 
+        for j in range(cols):
+            num = random.randint(-20, 20)
+            row.append(num)
+        matrix.append(row)
+        print(row) 
+        
+    # поиск минимального (предполагаем что первый элемент минимальный)
+    min_element = matrix[0][0] 
+    for i in range(rows):
+        for j in range(cols):
+            if matrix[i][j] < min_element:
+                min_element = matrix[i][j]
+    
+    print("минимальный элемент:", min_element)
+    
+    if rows >= 2:
+        print("вторая строка:", matrix[1])
+    else:
+        print("строк мало для вывода второй")
+
+    print("первый столбец:")
+    if cols >= 1:
+        for i in range(rows):
+            print(matrix[i][0])
+
+# функция для третьего задания
+def task_3():
+    print("\n--- задание 3 ---")
+    count = int(input("количество элементов: "))
+    
+    array = []
+    # заполнение массива вручную
+    for i in range(count):
+        num = int(input(f"число {i+1}: "))
+        array.append(num)
+        
+    found_zeros = False
+    # проверка на два нуля подряд
+    for i in range(len(array) - 1):
+        if array[i] == 0 and array[i+1] == 0:
+            found_zeros = True
+            
+    if found_zeros:
+        print("есть два нуля подряд")
+    else:
+        print("нет двух нулей подряд")
+
+# функция для четвертого задания
+def task_4():
+    print("\n--- задание 4 ---")
+    count = int(input("размер массива: "))
+    
+    array = []
+    # заполнение рандомом
+    for i in range(count):
+        array.append(random.randint(1, 100))
+        
+    print("массив:", array)
+    
+    count_div_3 = 0 
+    sum_even = 0    
+    count_even = 0  
+    
+    for num in array:
+        # проверка деления на 3 и четности
+        if num % 3 == 0:
+            count_div_3 = count_div_3 + 1
+        if num % 2 == 0:
+            sum_even = sum_even + num
+            count_even = count_even + 1
+            
+    print("делятся на 3:", count_div_3)
+    
+    if count_even > 0:
+        print("среднее четных:", sum_even / count_even)
+
+# запуск программы без циклов
+print("выберите номер задания (1-4):")
+choice = input("ваш выбор: ")
+
+if choice == '1':
+    task_1()
+elif choice == '2':
+    task_2()
+elif choice == '3':
+    task_3()
+elif choice == '4':
+    task_4()
+else:
+    print("неверный ввод, запустите программу снова")
